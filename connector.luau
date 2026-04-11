@@ -65,7 +65,7 @@ function base64_encode(data)
 end
 
 --// Functions \\--
-local function CreateDecompileFunction(options)
+local function CreateDecompileFunction(id, options)
     local Endpoint = options.Endpoint
     local EncodingCallback = options.EncodeBytecode or function(x) return x end
     local FailedRequestCallback = options.FailedRequestCallback or function(httpResult) return `-- Failed to decompile, error:\n\n--[[\n{httpResult}\n--]]` end
@@ -94,15 +94,15 @@ local function CreateDecompileFunction(options)
             return FailedRequestCallback(httpResult, scriptPath)
         end
 
-        return string.gsub(httpResult.Body, string.char(0x00CD), " ")
+        return `-- Decompiled with {id}\n{string.gsub(httpResult.Body, string.char(0x00CD), " ")}`
     end
 end
 
 local LuaEncode = loadstring(game:HttpGet("https://raw.githubusercontent.com/chadhyatt/LuaEncode/refs/heads/master/src/LuaEncode.lua"))()
 local cloneref = cloneref or function(x) return x end
 
-local KonstantDecompile = CreateDecompileFunction({ Endpoint = "http://api.plusgiant5.com/konstant/decompile" })
-local decompile = decompile or CreateDecompileFunction({
+local KonstantDecompile = CreateDecompileFunction("Konstant", { Endpoint = "http://api.plusgiant5.com/konstant/decompile" })
+local decompile = decompile or CreateDecompileFunction("Medal", {
     Endpoint = "https://medal.upio.dev/decompile",
     EncodingCallback = base64_encode,
     FailedRequestCallback = function(_, path)
