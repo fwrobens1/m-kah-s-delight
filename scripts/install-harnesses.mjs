@@ -200,6 +200,10 @@ async function installServer(serverRoot, results, options = {}) {
     { cwd: serverRoot, label: `Installing dependencies with ${runner}` }
   );
   await run(runner, runner === "pnpm" ? ["run", "build"] : ["run", "build"], { cwd: serverRoot, label: "Building server" });
+  const serverEntry = path.join(serverRoot, "dist", "index.js");
+  if (!exists(serverEntry)) {
+    throw new Error(`Build completed, but ${serverEntry} was not created.`);
+  }
   results.push({ status: "ok", message: `Server ready at ${serverRoot}` });
 }
 
