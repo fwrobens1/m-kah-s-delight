@@ -128,7 +128,7 @@ function showView(name) {
         v.style.display = 'none';
         v.classList.remove('view--entering');
     });
-    const labels = {clients:'Clients',server:'Server','server-logs':'Logs',settings:'Settings',overview:'Overview',tools:'Tools',scripts:'Scripts'};
+    const labels = {clients:'Clients',server:'Server','server-logs':'Logs',settings:'Settings',overview:'Overview',tools:'Tools',scripts:'Scripts','ai-chat':'AI Chat'};
     topbarSection.textContent = labels[name] || name;
 
     let targetView = null;
