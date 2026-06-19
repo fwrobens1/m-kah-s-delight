@@ -148,6 +148,11 @@ function showView(name) {
         fetchScripts(); 
         if (scriptsData.length > 0 && !scriptsViewingFile) renderScriptsBrowser();
     }
+    else if (name === 'ai-chat') {
+        targetView = viewAiChat;
+        viewAiChat.style.display = 'flex';
+        initChatView();
+    }
 
     // Only animate on actual navigation, not on re-entry to the same view
     if (targetView && prevView !== name) {
