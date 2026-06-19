@@ -1583,3 +1583,178 @@ setInterval(() => {
 updateStatus();
 setSidebarMode('home');
 showView('clients');
+
+/* ── AI Chat ─────────────────────────────────────────────── */
+const chatStream = $('chatStream');
+const chatInput = $('chatInput');
+const chatSendBtn = $('chatSendBtn');
+const chatClearBtn = $('chatClearBtn');
+const chatSettingsBtn = $('chatSettingsBtn');
+const chatSettingsModal = $('chatSettingsModal');
+const chatSettingsCancel = $('chatSettingsCancel');
+const chatSettingsSave = $('chatSettingsSave');
+const chatModelLabel = $('chatModelLabel');
+const chatBaseUrlInput = $('chatBaseUrl');
+const chatApiKeyInput = $('chatApiKey');
+const chatModelInput = $('chatModel');
+
+let chatHistory = []; // {role, content}
+let chatBusy = false;
+let chatInitialized = false;
+
+function loadChatConfig() {
+    try {
+        const raw = localStorage.getItem('rmcp.aiChat');
+        if (raw) return JSON.parse(raw);
+    } catch {}
+    return { baseUrl: 'https://api.openai.com/v1', apiKey: '', model: 'gpt-4o-mini' };
+}
+function saveChatConfig(cfg) { localStorage.setItem('rmcp.aiChat', JSON.stringify(cfg)); }
+
+function updateChatModelLabel() {
+    const cfg = loadChatConfig();
+    if (!cfg.apiKey) chatModelLabel.textContent = 'No API key — click Settings';
+    else chatModelLabel.textContent = (cfg.model || 'gpt-4o-mini') + ' · ' + (cfg.baseUrl || '');
+}
+
+function autoGrow() {
+    if (!chatInput) return;
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 220) + 'px';
+}
+
+function renderMd(text) {
+    // very small markdown: code fences + inline code + line breaks
+    let html = escapeHtml(text);
+    html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) =>
+        `<pre class="chat-code"><div class="chat-code-bar"><span>${escapeHtml(lang || 'lua')}</span><button class="chat-code-copy" data-copy="${encodeURIComponent(code)}">Copy</button></div><code>${escapeHtml(code)}</code></pre>`);
+    html = html.replace(/`([^`\n]+)`/g, '<code class="chat-ic">$1</code>');
+    html = html.replace(/\n/g, '<br/>');
+    return html;
+}
+
+function appendMessage(role, content, opts = {}) {
+    if (chatStream.querySelector('.chat-empty')) chatStream.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'chat-msg chat-msg--' + role;
+    if (opts.id) wrap.id = opts.id;
+    wrap.innerHTML = `<div class="chat-msg-role">${role === 'user' ? 'You' : role === 'assistant' ? 'AI' : 'Tool'}</div><div class="chat-msg-body">${renderMd(content)}</div>`;
+    chatStream.appendChild(wrap);
+    chatStream.scrollTop = chatStream.scrollHeight;
+    return wrap;
+}
+
+function appendToolTrace(trace) {
+    if (!trace || !trace.length) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'chat-trace';
+    wrap.innerHTML = trace.map(t => {
+        const args = (() => { try { return JSON.stringify(t.args); } catch { return ''; } })();
+        return `<details class="chat-tool"><summary><span class="chat-tool-name">${escapeHtml(t.tool)}</span><span class="chat-tool-args">${escapeHtml(args)}</span></summary><pre class="chat-tool-out">${escapeHtml(String(t.result).slice(0, 4000))}</pre></details>`;
+    }).join('');
+    chatStream.appendChild(wrap);
+    chatStream.scrollTop = chatStream.scrollHeight;
+}
+
+async function sendChat() {
+    if (chatBusy) return;
+    const text = chatInput.value.trim();
+    if (!text) return;
+    const cfg = loadChatConfig();
+    if (!cfg.apiKey) {
+        toast && toast('Add an API key in chat Settings first', 'error');
+        chatSettingsModal.classList.add('open');
+        return;
+    }
+    if (!selectedClientId) {
+        toast && toast('Select a client first', 'error');
+        return;
+    }
+    chatInput.value = '';
+    autoGrow();
+    appendMessage('user', text);
+    chatHistory.push({ role: 'user', content: text });
+
+    chatBusy = true;
+    chatSendBtn.disabled = true;
+    const thinking = appendMessage('assistant', '…');
+    thinking.classList.add('chat-msg--thinking');
+
+    try {
+        const resp = await fetch('/api/ai-chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId: selectedClientId, messages: chatHistory, config: cfg }),
+        });
+        const data = await resp.json();
+        thinking.remove();
+        if (data.trace) appendToolTrace(data.trace);
+        if (data.error) {
+            appendMessage('assistant', '⚠️ ' + data.error);
+        } else {
+            const content = data.assistant || '(no response)';
+            appendMessage('assistant', content);
+            chatHistory.push({ role: 'assistant', content });
+        }
+    } catch (err) {
+        thinking.remove();
+        appendMessage('assistant', '⚠️ Network error: ' + (err && err.message || err));
+    } finally {
+        chatBusy = false;
+        chatSendBtn.disabled = false;
+        chatInput.focus();
+    }
+}
+
+function initChatView() {
+    if (chatInitialized) { updateChatModelLabel(); return; }
+    chatInitialized = true;
+    updateChatModelLabel();
+
+    chatInput.addEventListener('input', autoGrow);
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+    });
+    chatSendBtn.addEventListener('click', sendChat);
+
+    chatClearBtn.addEventListener('click', () => {
+        chatHistory = [];
+        chatStream.innerHTML = '';
+        const empty = document.createElement('div');
+        empty.className = 'chat-empty';
+        empty.innerHTML = '<div class="chat-empty-title">New chat</div><div class="chat-empty-sub">Ask anything about the connected client.</div>';
+        chatStream.appendChild(empty);
+    });
+
+    chatStream.addEventListener('click', (e) => {
+        const btn = e.target.closest('.chat-code-copy');
+        if (btn) {
+            navigator.clipboard.writeText(decodeURIComponent(btn.dataset.copy || ''));
+            btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy', 1200);
+        }
+        const sug = e.target.closest('.chat-suggestion');
+        if (sug) {
+            const q = sug.dataset.q || sug.textContent;
+            chatInput.value = q.replace(/^"|"$/g, '');
+            autoGrow(); chatInput.focus();
+        }
+    });
+
+    chatSettingsBtn.addEventListener('click', () => {
+        const cfg = loadChatConfig();
+        chatBaseUrlInput.value = cfg.baseUrl || '';
+        chatApiKeyInput.value = cfg.apiKey || '';
+        chatModelInput.value = cfg.model || '';
+        chatSettingsModal.classList.add('open');
+    });
+    chatSettingsCancel.addEventListener('click', () => chatSettingsModal.classList.remove('open'));
+    chatSettingsSave.addEventListener('click', () => {
+        saveChatConfig({
+            baseUrl: chatBaseUrlInput.value.trim() || 'https://api.openai.com/v1',
+            apiKey: chatApiKeyInput.value.trim(),
+            model: chatModelInput.value.trim() || 'gpt-4o-mini',
+        });
+        chatSettingsModal.classList.remove('open');
+        updateChatModelLabel();
+    });
+}
