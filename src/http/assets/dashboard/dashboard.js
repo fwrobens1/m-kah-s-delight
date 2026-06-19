@@ -31,6 +31,7 @@ const viewServer = $('viewServer');
 const viewSettings = $('viewSettings');
 const viewServerLogs = $('viewServerLogs');
 const viewScripts = $('viewScripts');
+const viewAiChat = $('viewAiChat');
 const topbarBack = $('topbarBack');
 const sidebarNavHome = $('sidebarNavHome');
 const sidebarNavClient = $('sidebarNavClient');
