@@ -59,6 +59,7 @@
                 <button class="sidebar-item sidebar-item--active" data-view="overview"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</button>
                 <button class="sidebar-item" data-view="scripts"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>Scripts</button>
                 <button class="sidebar-item" data-view="tools"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Tools</button>
+                <button class="sidebar-item" data-view="ai-chat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="11" r="0.6" fill="currentColor"/><circle cx="12" cy="11" r="0.6" fill="currentColor"/><circle cx="15" cy="11" r="0.6" fill="currentColor"/></svg>AI Chat</button>
             </nav>
             <div class="sidebar-footer">
                 <div class="sidebar-uptime">
@@ -471,7 +472,50 @@
                             </div>
                         </div>
                     </div>
+            </div>
+
+            <!-- ─── AI Chat view ──────────────────────────────── -->
+            <div class="view view--chat" id="viewAiChat" style="display:none">
+                <div class="chat-wrap">
+                    <div class="chat-header">
+                        <div class="chat-header-left">
+                            <h2 class="chat-title">AI Chat</h2>
+                            <span class="chat-sub" id="chatModelLabel">No model configured</span>
+                        </div>
+                        <div class="chat-header-right">
+                            <button class="logs-btn" id="chatClearBtn">New chat</button>
+                            <button class="logs-btn" id="chatSettingsBtn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852 1 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                Settings
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chat-stream" id="chatStream">
+                        <div class="chat-empty">
+                            <div class="chat-empty-icon">
+                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            </div>
+                            <div class="chat-empty-title">Roblox MCP AI</div>
+                            <div class="chat-empty-sub">Ask the AI to write scripts, analyze the game, search through code, or execute code on the connected client.</div>
+                            <div class="chat-suggestions">
+                                <button class="chat-suggestion" data-q='"Make me a fly script with a GUI toggle button"'>"Make me a fly script with a GUI toggle button"</button>
+                                <button class="chat-suggestion" data-q='"Search for all RemoteEvents in the game"'>"Search for all RemoteEvents in the game"</button>
+                                <button class="chat-suggestion" data-q='"Get the current PlaceId and player count"'>"Get the current PlaceId and player count"</button>
+                                <button class="chat-suggestion" data-q='"Find the script that handles player health"'>"Find the script that handles player health"</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-composer">
+                        <textarea id="chatInput" class="chat-input" rows="1" placeholder="AI to write scripts, analyze the game, execute code…"></textarea>
+                        <button class="chat-send" id="chatSendBtn" title="Send">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="5 12 12 5 19 12"/><line x1="12" y1="5" x2="12" y2="20"/></svg>
+                        </button>
+                    </div>
                 </div>
+            </div>
+
             </div>
             </div>
         </main>
@@ -489,6 +533,25 @@
             <div class="modal-footer">
                 <button class="modal-btn modal-btn--cancel" id="confirmCancelBtn">Cancel</button>
                 <button class="modal-btn modal-btn--primary" id="confirmOkBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat settings modal -->
+    <div class="modal-overlay" id="chatSettingsModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div class="modal-title">AI Chat settings</div>
+                <div class="modal-desc">OpenAI-compatible endpoint. Key stays in your browser and is forwarded per request.</div>
+            </div>
+            <div class="modal-body">
+                <div class="settings-field"><label>Base URL</label><input type="text" id="chatBaseUrl" placeholder="https://api.openai.com/v1"></div>
+                <div class="settings-field"><label>API Key</label><input type="password" id="chatApiKey" placeholder="sk-..."></div>
+                <div class="settings-field"><label>Model</label><input type="text" id="chatModel" placeholder="gpt-4o-mini"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn--cancel" id="chatSettingsCancel">Cancel</button>
+                <button class="modal-btn modal-btn--primary" id="chatSettingsSave">Save</button>
             </div>
         </div>
     </div>
