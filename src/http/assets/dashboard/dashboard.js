@@ -112,7 +112,7 @@ function updateUptime() {
 setInterval(updateUptime, 1000);
 
 /* ── View switching ──────────────────────────────────────── */
-const allViews = () => [viewClients, viewOverview, viewTools, viewServer, viewSettings, viewServerLogs, viewScripts];
+const allViews = () => [viewClients, viewOverview, viewTools, viewServer, viewSettings, viewServerLogs, viewScripts, viewAiChat];
 
 function setSidebarMode(mode) {
     dashboardMode = mode;
