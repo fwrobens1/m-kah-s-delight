@@ -472,7 +472,50 @@
                             </div>
                         </div>
                     </div>
+            </div>
+
+            <!-- ─── AI Chat view ──────────────────────────────── -->
+            <div class="view view--chat" id="viewAiChat" style="display:none">
+                <div class="chat-wrap">
+                    <div class="chat-header">
+                        <div class="chat-header-left">
+                            <h2 class="chat-title">AI Chat</h2>
+                            <span class="chat-sub" id="chatModelLabel">No model configured</span>
+                        </div>
+                        <div class="chat-header-right">
+                            <button class="logs-btn" id="chatClearBtn">New chat</button>
+                            <button class="logs-btn" id="chatSettingsBtn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852 1 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                Settings
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chat-stream" id="chatStream">
+                        <div class="chat-empty">
+                            <div class="chat-empty-icon">
+                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            </div>
+                            <div class="chat-empty-title">Roblox MCP AI</div>
+                            <div class="chat-empty-sub">Ask the AI to write scripts, analyze the game, search through code, or execute code on the connected client.</div>
+                            <div class="chat-suggestions">
+                                <button class="chat-suggestion" data-q='"Make me a fly script with a GUI toggle button"'>"Make me a fly script with a GUI toggle button"</button>
+                                <button class="chat-suggestion" data-q='"Search for all RemoteEvents in the game"'>"Search for all RemoteEvents in the game"</button>
+                                <button class="chat-suggestion" data-q='"Get the current PlaceId and player count"'>"Get the current PlaceId and player count"</button>
+                                <button class="chat-suggestion" data-q='"Find the script that handles player health"'>"Find the script that handles player health"</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-composer">
+                        <textarea id="chatInput" class="chat-input" rows="1" placeholder="AI to write scripts, analyze the game, execute code…"></textarea>
+                        <button class="chat-send" id="chatSendBtn" title="Send">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="5 12 12 5 19 12"/><line x1="12" y1="5" x2="12" y2="20"/></svg>
+                        </button>
+                    </div>
                 </div>
+            </div>
+
             </div>
             </div>
         </main>
