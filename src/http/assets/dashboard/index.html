@@ -537,6 +537,25 @@
         </div>
     </div>
 
+    <!-- Chat settings modal -->
+    <div class="modal-overlay" id="chatSettingsModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div class="modal-title">AI Chat settings</div>
+                <div class="modal-desc">OpenAI-compatible endpoint. Key stays in your browser and is forwarded per request.</div>
+            </div>
+            <div class="modal-body">
+                <div class="settings-field"><label>Base URL</label><input type="text" id="chatBaseUrl" placeholder="https://api.openai.com/v1"></div>
+                <div class="settings-field"><label>API Key</label><input type="password" id="chatApiKey" placeholder="sk-..."></div>
+                <div class="settings-field"><label>Model</label><input type="text" id="chatModel" placeholder="gpt-4o-mini"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn--cancel" id="chatSettingsCancel">Cancel</button>
+                <button class="modal-btn modal-btn--primary" id="chatSettingsSave">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script src="dashboard.js"></script>
 </body>
 </html>
